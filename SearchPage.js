@@ -13,6 +13,8 @@ import {
 
 import SearchResults from './SearchResults';
 
+
+
 export default class SearchPage extends Component {
     
     constructor(props) {
@@ -30,39 +32,8 @@ export default class SearchPage extends Component {
         console.log(this.state.searchString);
     }
 
-    _executeQuery(query) {
-        console.log(query);
-        this.setState({isLoading: true});
-        fetch(query)
-            .then(response => response.json())
-            .then(json => this._handleResponse(json.response))
-            .catch(error => {
-                this.setState({
-                    isLoading: false,
-                    message: 'Something bad happend ' + error
-                });
-            });
-    }
 
-    _handleResponse(response) {
-        this.setState({isLoading: false, message: ''});
-        if (response.application_response_code.substr(0, 1) === '1') {
-            console.log('Promise found : ' + response.listings.length);
-            this.props.navigator.push({
-                title: 'Results',
-                component: SearchResults,
-                passProps: {listings: response.listings}
-            });
-        } else {
-            this.setState({message: 'Location not recognized; please try again.'});
-        }
-    }
-
-    onSearchPressed() {
-        var query = urlForQueryAndPage('place_name', this.state.searchString, 1);
-        this._executeQuery(query);
-    }
-
+    
     urlForQueryAndPage(key, value, pageNumber) {
         var data = {
             country: 'uk',
@@ -78,7 +49,40 @@ export default class SearchPage extends Component {
             .map(key => key + '=' + encodeURIComponent(data[key]))
             .join('&');
         return 'http://api.nestoria.co.uk/api?' + querystring;
-    };
+    }
+
+    _executeQuery(query) {
+        console.log(query);
+        this.setState({isLoading: true});
+        fetch(query)
+            .then(response => response.json())
+            .then(json => this._handleResponse(json.response))
+            .catch(error => {
+                this.setState({
+                    isLoading: false,
+                    message: 'Something bad happend: ' + error
+                });
+            });
+    }
+
+    _handleResponse(response) {  
+        this.setState({isLoading: false, message: ''});
+        if (response.application_response_code.substr(0, 1) === '1') {
+            this.props.navigator.push({
+                component: SearchResults,
+                passProps: {listings: response.listings}
+            });
+        } else {
+            this.setState({message: 'Location not recognized; please try again.'});
+        }
+    }
+
+   
+    onSearchPressed() {
+        var query = this.urlForQueryAndPage('place_name', this.state.searchString, 1);
+        this._executeQuery(query);
+    }
+
 
     render() {
       var spinner = this.state.isLoading ? 

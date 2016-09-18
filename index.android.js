@@ -12,7 +12,6 @@ import {
 import SearchPage from './SearchPage';
 
 
-
 /**
  *  Launcher
  * 
@@ -25,7 +24,8 @@ class PropertyFinder extends Component {
   
   render() {
     return (
-        <Navigator 
+        <Navigator
+            initialRoute={{component: SearchPage}}
             style={styles.container}
             renderScene={this.renderNav}
         />
@@ -33,7 +33,7 @@ class PropertyFinder extends Component {
   }
 
   renderNav(route, nav) {
-    return <SearchPage />;
+    return <route.component navigator={nav} {...route.passProps} />;
   }
 
 }
