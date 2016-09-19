@@ -13,8 +13,6 @@ import {
 
 import SearchResults from './SearchResults';
 
-
-
 export default class SearchPage extends Component {
     
     constructor(props) {
@@ -83,6 +81,22 @@ export default class SearchPage extends Component {
         this._executeQuery(query);
     }
 
+    onLocationPressed() {
+        navigator.geolocation.getCurrentPosition(
+            location => {
+                var search = location.coords.latitude + ','+location.coords.longitude;
+                this.setState({searchString: search});
+                var query = this.urlForQueryAndPage('centre_point', search, 1);
+                this._executeQuery(query);
+            },
+            error => {
+                this.setState({
+                    message: 'There was a problem with obtaining your location: ' + error
+                });
+            }
+        );
+    }
+
 
     render() {
       var spinner = this.state.isLoading ? 
@@ -109,7 +123,8 @@ export default class SearchPage extends Component {
             </TouchableHighlight>
           </View>
           <TouchableHighlight style={styles.button}
-                              underlayColor='#99d9f4'>
+                              underlayColor='#99d9f4'
+                              onPress={this.onLocationPressed.bind(this)}>
               <Text style={styles.buttonText}>Location</Text>
           </TouchableHighlight>
           <Image source={{uri: 'house'}}
@@ -129,7 +144,7 @@ var styles = StyleSheet.create({
     },
     container: {
         padding: 30,
-        marginTop: 65,
+        marginTop: 100,
         alignItems: 'center',
     },
     flowRight: {
